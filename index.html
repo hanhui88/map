@@ -78,19 +78,6 @@
         float: right;
       }
 
-      .neighborhood-discovery .star-icon {
-        filter: invert(88%) sepia(60%) saturate(2073%) hue-rotate(318deg) brightness(93%) contrast(104%);
-        height: 1.2em;
-        margin-right: -0.3em;
-        margin-top: -0.08em;
-        vertical-align: top;
-        width: 1.2em;
-      }
-
-      .neighborhood-discovery .star-icon:last-child {
-        margin-right: 0.2em;
-      }
-
       .neighborhood-discovery .travel-icon {
         height: 1.2em;
         margin-top: -0.08em;
@@ -254,38 +241,15 @@
 
       .neighborhood-discovery .details-panel .photos {
         text-align: center;
+        padding: 0;
       }
 
       .neighborhood-discovery .details-panel .photo {
-        display: inline-block;
-        height: 5.5em;
-        width: 5.5em;
-      }
-
-      .neighborhood-discovery .details-panel .review {
-        margin-top: 1.2em;
-      }
-
-      .neighborhood-discovery .details-panel .review .reviewer-avatar {
-        background-repeat: no-repeat;
-        background-size: cover;
-        float: left;
-        height: 1.8em;
-        margin-right: 0.8em;
-        width: 1.8em;
-      }
-
-      .neighborhood-discovery .details-panel .review .reviewer-name {
-        color: #202124;
-        font-weight: 500;
-        line-height: 1.8em;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      .neighborhood-discovery .details-panel .review .rating {
-        margin: 0.5em 0;
+        border-radius: 0;
+        height: 0;
+        margin-bottom: 0.3em;
+        padding-top: 100%;
+        width: 100%;
       }
 
       .neighborhood-discovery .details-panel .attribution {
@@ -367,29 +331,6 @@
         return capitalized.replace(/_/g, ' ');
       }
 
-      /** Initializes an array of zeros with the given size. */
-      function initArray(arraySize) {
-        const array = [];
-        while (array.length < arraySize) {
-          array.push(0);
-        }
-        return array;
-      }
-
-      /** Assigns star icons to an object given its rating (out of 5). */
-      function addStarIcons(obj) {
-        if (!obj.rating) return;
-        const starsOutOfTen = Math.round(2 * obj.rating);
-        const fullStars = Math.floor(starsOutOfTen / 2);
-        const halfStars = fullStars !== starsOutOfTen / 2 ? 1 : 0;
-        const emptyStars = 5 - fullStars - halfStars;
-
-        // Express stars as arrays to make iterating in Handlebars easy.
-        obj.fullStarIcons = initArray(fullStars);
-        obj.halfStarIcons = initArray(halfStars);
-        obj.emptyStarIcons = initArray(emptyStars);
-      }
-
       /**
        * Constructs an array of opening hours by day from a PlaceOpeningHours object,
        * where adjacent days of week with the same hours are collapsed into one element.
@@ -428,9 +369,7 @@
       const ND_MARKER_ICONS_BY_TYPE = {
         // Full list of icons can be found at https://fonts.google.com/icons
         '_default': 'circle',
-        'park': 'park',
-        'museum': 'museum',
-        'shopping_mall': 'local_mall',
+        'secondary_school': 'school',
       };
 
       /**
@@ -609,23 +548,6 @@
               if (result.formatted_phone_number) place.phoneNumber = result.formatted_phone_number;
               if (result.opening_hours) place.openingHours = parseDaysHours(result.opening_hours);
 
-              // Review details.
-              if (result.rating) {
-                place.rating = result.rating;
-                addStarIcons(place);
-              }
-              if (result.user_ratings_total) place.numReviews = result.user_ratings_total;
-              if (result.price_level) {
-                place.priceLevel = result.price_level;
-                place.dollarSigns = initArray(result.price_level);
-              }
-              if (result.reviews) {
-                place.reviews = result.reviews;
-                for (let review of place.reviews) {
-                  addStarIcons(review);
-                }
-              }
-
               for (let field of missingFields) {
                 place.fetchedFields.add(field);
               }
@@ -722,7 +644,6 @@
             widget.fetchPlaceDetails(placeId, [
               'name', 'types', 'geometry.location', 'formatted_address', 'photo', 'url',
               'website', 'formatted_phone_number', 'opening_hours',
-              'rating', 'user_ratings_total', 'price_level', 'review',
             ], processResult);
           };
 
@@ -781,7 +702,6 @@
               widget.fetchPlaceDetails(place.placeId, [
                 'name', 'types', 'geometry.location',
                 'photo',
-                'rating', 'user_ratings_total', 'price_level',
               ], processResult);
             }
           };
@@ -805,7 +725,6 @@
             fields: [
               'place_id', 'name', 'types', 'geometry.location', 'formatted_address', 'photo', 'url',
               'website', 'formatted_phone_number', 'opening_hours',
-              'rating', 'user_ratings_total', 'price_level', 'review',
             ],
             bounds: widget.mapBounds,
             strictBounds: true,
@@ -880,20 +799,17 @@
     </script>
     <script>
       const CONFIGURATION = {
-        "capabilities": {"search":true,"distances":true,"directions":true,"contacts":true,"atmospheres":true,"thumbnails":true},
+        "capabilities": {"search":true,"distances":true,"directions":true,"contacts":true,"atmospheres":false,"thumbnails":true},
         "pois": [
-          {"placeId": "ChIJD3uTd9hx5kcR1IQvGfr8dbk"},
-          {"placeId": "ChIJ442GNENu5kcRGYUrvgqHw88"},
-          {"placeId": "ChIJAQAAMCxu5kcRx--_4QnbGcI"},
-          {"placeId": "ChIJ0dzuSNBv5kcRa6BHUVdFm0k"},
-          {"placeId": "ChIJPUBtQTVu5kcRnPMYVq9Mthg"},
-          {"placeId": "ChIJVUrgmz5u5kcRWPSN-T8a730"},
-          {"placeId": "ChIJwxT3mL5v5kcRAsTd3v0lJOY"},
-          {"placeId": "ChIJ6SJcCP5x5kcRJt8m9_lR7_Q"}
+          {"placeId": "ChIJbY_Puwka2jERLeaVt3kXb9M"},
+          {"placeId": "ChIJjZtr7goa2jERadfzauNDxEg"},
+          {"placeId": "ChIJH0HEiaAQ2jERGqZDNd_Uutc"},
+          {"placeId": "ChIJQfjxVoIb2jERAaOH3KV2iBU"},
+          {"placeId": "ChIJoZcpjwka2jER1TAAmXeX8WM"}
         ],
         "centerMarker": {"icon":"circle"},
         "mapRadius": 2000,
-        "mapOptions": {"center":{"lat":48.8773,"lng":2.33},"fullscreenControl":true,"mapTypeControl":true,"streetViewControl":false,"zoom":16,"zoomControl":true,"maxZoom":20,"mapId":""},
+        "mapOptions": {"center":{"lat":1.3287195,"lng":103.8022896},"fullscreenControl":true,"mapTypeControl":true,"streetViewControl":false,"zoom":16,"zoomControl":true,"maxZoom":20,"mapId":""},
         "mapsApiKey": "YOUR_API_KEY_HERE"
       };
 
@@ -906,18 +822,6 @@
         <li class="place-result">
           <div class="text">
             <button class="name">{{name}}</button>
-            <div class="info">
-              {{#if rating}}
-                <span>{{rating}}</span>
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star/v15/24px.svg" alt="rating" class="star-icon"/>
-              {{/if}}
-              {{#if numReviews}}
-                <span>&nbsp;({{numReviews}})</span>
-              {{/if}}
-              {{#if priceLevel}}
-                &#183;&nbsp;<span>{{#each dollarSigns}}${{/each}}&nbsp;</span>
-              {{/if}}
-            </div>
             <div class="info">{{type}}</div>
           </div>
           <button class="photo" style="background-image:url({{photos.0.urlSmall}})" aria-label="show photo in viewer"></button>
@@ -934,31 +838,7 @@
       <header>
         <h2>{{name}}</h2>
         <div class="info">
-          {{#if rating}}
-            <span class="star-rating-numeric">{{rating}}</span>
-            <span>
-              {{#each fullStarIcons}}
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star/v15/24px.svg" alt="full star" class="star-icon"/>
-              {{/each}}
-              {{#each halfStarIcons}}
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_half/v17/24px.svg" alt="half star" class="star-icon"/>
-              {{/each}}
-              {{#each emptyStarIcons}}
-                <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_outline/v9/24px.svg" alt="empty star" class="star-icon"/>
-              {{/each}}
-            </span>
-          {{/if}}
-          {{#if numReviews}}
-            <a href="{{url}}" target="_blank">{{numReviews}} reviews</a>
-          {{else}}
-            <a href="{{url}}" target="_blank">See on Google Maps</a>
-          {{/if}}
-          {{#if priceLevel}}
-            &#183;
-            <span class="price-dollars">
-              {{#each dollarSigns}}${{/each}}
-            </span>
-          {{/if}}
+          <a href="{{url}}" target="_blank">See on Google Maps</a>
         </div>
         {{#if type}}
           <div class="info">{{type}}</div>
@@ -1012,35 +892,7 @@
       {{#if photos}}
         <div class="photos section">
           {{#each photos}}
-            <button class="photo" style="background-image:url({{urlSmall}})" aria-label="show photo in viewer"></button>
-          {{/each}}
-        </div>
-      {{/if}}
-      {{#if reviews}}
-        <div class="reviews section">
-          <p class="attribution">Reviews by Google users</p>
-          {{#each reviews}}
-            <div class="review">
-              <a class="reviewer-identity" href="{{author_url}}" target="_blank">
-                <div class="reviewer-avatar" style="background-image:url({{profile_photo_url}})"></div>
-                <div class="reviewer-name">{{author_name}}</div>
-              </a>
-              <div class="rating info">
-                <span>
-                  {{#each fullStarIcons}}
-                    <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star/v15/24px.svg" alt="full star" class="star-icon"/>
-                  {{/each}}
-                  {{#each halfStarIcons}}
-                    <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_half/v17/24px.svg" alt="half star" class="star-icon"/>
-                  {{/each}}
-                  {{#each emptyStarIcons}}
-                    <img src="https://fonts.gstatic.com/s/i/googlematerialicons/star_outline/v9/24px.svg" alt="empty star" class="star-icon"/>
-                  {{/each}}
-                </span>
-                <span class="review-time">{{relative_time_description}}</span>
-              </div>
-              <div class="info">{{text}}</div>
-            </div>
+            <button class="photo" style="background-image:url({{urlLarge}})" aria-label="show photo in viewer"></button>
           {{/each}}
         </div>
       {{/if}}
@@ -1090,6 +942,6 @@
         <path d="M13 0C5.817 0 0 5.93 0 13.267c0 7.862 5.59 10.81 9.555 17.624C12.09 35.248 11.342 38 13 38c1.723 0 .975-2.817 3.445-7.043C20.085 24.503 26 21.162 26 13.267 26 5.93 20.183 0 13 0Z"/>
       </svg>
     </div>
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY_HERE&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_neighborhooddiscovery_v2_cABCDEF" async defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJQ_vHSKxZ98FEx86R3kpM4kJrDy8sXVg&callback=initMap&libraries=places,geometry&solution_channel=GMP_QB_neighborhooddiscovery_v2_cABCDF" async defer></script>
   </body>
 </html>
